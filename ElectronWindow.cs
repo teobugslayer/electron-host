@@ -1,40 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 
 namespace electron_host
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct RECT
-    {
-        public int left;
-        public int top;
-        public int right;
-        public int bottom;
-
-        public int Width
-        {
-            get
-            {
-                return (this.right - this.left);
-            }
-        }
-        public int Height
-        {
-            get
-            {
-                return (this.bottom - this.top);
-            }
-        }
-    }
-
     class ElectronWindow : HwndHost
     {
         private Window parentWindow;
@@ -78,12 +51,6 @@ namespace electron_host
 
         [DllImport("user32.dll", ExactSpelling = true, SetLastError = true)]
         public static extern IntPtr SetParent(IntPtr hwndChild, IntPtr hwdNewParent);
-
-        [DllImport("user32.dll", CallingConvention = CallingConvention.Winapi, ExactSpelling = true, SetLastError = true)]
-        public static extern bool MoveWindow(IntPtr hwnd, int x, int y, int width, int height, bool repaint);
-
-        [DllImport("user32.dll")]
-        public static extern bool GetWindowRect(IntPtr hWnd, ref RECT lpRect);
 
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
         {
