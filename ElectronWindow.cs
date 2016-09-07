@@ -14,20 +14,23 @@ namespace electron_host
         {
             var rootDir = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), @"..\..");
 
+            // prepare to talk to the child electron process
             var hwndFile = Path.Combine(rootDir, "hwnd.txt");
             File.Delete(hwndFile);
 
+            // start electron sub-process
             var electronExecutable = Path.Combine(rootDir, @"electron\electron.exe");
             var jsApp = Path.Combine(rootDir, @"app\index.js");
             var electronProcess = Process.Start(electronExecutable, '"' + jsApp + '"');
 
+            // get the electron main window hwnd - the index.js writes it.
             while (!File.Exists(hwndFile))
                 Thread.Sleep(10);
             while (true)
             {
                 var content = File.ReadAllText(hwndFile);
                 if (!string.IsNullOrEmpty(content))
-                    return new IntPtr(UInt32.Parse(content));
+                    return new IntPtr(UInt32.Parse(content)); // this works only for 32 WPF process and 32 bit Electron process
             }
         }
 
