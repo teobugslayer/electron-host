@@ -10,13 +10,6 @@ namespace electron_host
 {
     class ElectronWindow : HwndHost
     {
-        private Window parentWindow;
-        
-        public ElectronWindow(Window parentWindow)
-        {
-            this.parentWindow = parentWindow;
-        }
-
         IntPtr GetElectronHwnd()
         {
             var rootDir = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), @"..\..");
@@ -38,6 +31,18 @@ namespace electron_host
             }
         }
 
+        void ConvertToChildWindow(IntPtr hwnd)
+        {
+            // convert the "normal" window of Electron to a child one
+            var style = GetWindowLong(hwnd, GWL_STYLE);
+            style |= WS_CHILD;
+            SetWindowLong(hwnd, GWL_STYLE, style);
+
+            var styleEx = GetWindowLong(hwnd, GWL_EXSTYLE);
+            styleEx &= ~WS_EX_APPWINDOW;
+            SetWindowLong(hwnd, GWL_EXSTYLE, styleEx);
+        }
+
         const int GWL_STYLE = -16;
         const int GWL_EXSTYLE = -20;
         const uint WS_CHILD = 0x40000000;
@@ -55,21 +60,8 @@ namespace electron_host
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
         {
             var hwnd = GetElectronHwnd();
-
-            // convert the "normal" window of Electron to a child one
-            var style = GetWindowLong(hwnd, GWL_STYLE);
-            style |= WS_CHILD;
-            SetWindowLong(hwnd, GWL_STYLE, style);
-
-            var styleEx = GetWindowLong(hwnd, GWL_EXSTYLE);
-            styleEx &= ~WS_EX_APPWINDOW;
-            SetWindowLong(hwnd, GWL_EXSTYLE, styleEx);
-
-            // set our window to be a parent to Electron's one
-            var helper = new WindowInteropHelper(parentWindow);
-            var parentHwnd = helper.Handle;
-
-            SetParent(hwnd, parentHwnd);
+            ConvertToChildWindow(hwnd);
+            SetParent(hwnd, hwndParent.Handle);
 
             return new HandleRef(this, hwnd);
         }

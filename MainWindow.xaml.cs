@@ -11,7 +11,7 @@ namespace electron_host
         {
             InitializeComponent();
 
-            this.Content = new ElectronWindow(this);
+            this.Content = new ElectronWindow();
         }
     }
 }
