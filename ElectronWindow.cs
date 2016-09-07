@@ -55,11 +55,8 @@ namespace electron_host
             var jsApp = Path.Combine(rootDir, @"app\index.js");
             var electronProcess = Process.Start(electronExecutable, '"' + jsApp + '"');
 
-            var x = BitConverter.IsLittleEndian;
-
             while (!File.Exists(hwndFile))
                 Thread.Sleep(10);
-
             while (true)
             {
                 var content = File.ReadAllText(hwndFile);
