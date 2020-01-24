@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows;
 using System.Windows.Interop;
 
 namespace electron_host
@@ -12,7 +11,7 @@ namespace electron_host
     {
         IntPtr GetElectronHwnd()
         {
-            var rootDir = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), @"..\..");
+            var rootDir = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), @"..\..\..");
 
             // prepare to talk to the child electron process
             var hwndFile = Path.Combine(rootDir, "hwnd.txt");
@@ -21,7 +20,7 @@ namespace electron_host
             // start electron sub-process
             var electronExecutable = Path.Combine(rootDir, @"electron\electron.exe");
             var jsApp = Path.Combine(rootDir, @"app\index.js");
-            var electronProcess = Process.Start(electronExecutable, '"' + jsApp + '"');
+            using var electronProcess = Process.Start(electronExecutable, '"' + jsApp + '"');
 
             // get the electron main window hwnd - the index.js writes it.
             while (!File.Exists(hwndFile))
